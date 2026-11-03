@@ -1,0 +1,25 @@
+name: Tests
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - name: Verify example fails closed
+        run: |
+          set +e
+          node src/cli.js examples/release.json > result.json
+          code=$?
+          set -e
+          test "$code" -eq 1
+          node --input-type=module -e "import fs from 'node:fs'; const x=JSON.parse(fs.readFileSync('result.json','utf8')); if(x.decision!=='HOLD'||x.blockers.length===0) process.exit(1)"
