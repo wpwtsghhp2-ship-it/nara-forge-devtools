@@ -23,3 +23,11 @@ Open an issue describing a bug or feature. Contributions should include tests an
 
 ## License
 MIT.
+
+## Relationship to Nara Forge
+
+[Nara Forge](https://naraforge.com/) is the related application. Its main application source repository is private; this repository contains a **separately licensed public utility**, not the full Nara Forge application.
+
+A private-repository integration workflow is proposed in Nara Forge PR #1334. It is designed to run syntax checks on three real application source files and feed the resulting evidence metadata into this public verifier. Because the full release checks and production commit are not verified, the expected verdict is **HOLD**. This integration has not yet been confirmed by a hosted CI run.
+
+The public utility does not publish private source code or private CI logs. This is an initial open-source project; no claims are made about community adoption, production deployment, or external maintainers.
