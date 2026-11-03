@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {verifyRelease} from '../src/verify.js';
+const sha='a'.repeat(40);
+const manifest=()=>({candidateCommit:sha,productionCommit:sha,maxEvidenceAgeHours:24,unresolvedBlockers:[],requiredSuites:[{name:'unit',passed:10,failed:0,skipped:0,commit:sha,completedAt:'2026-11-03T16:00:00Z',evidenceUrl:'https://example.org/evidence'}]});
+const now=new Date('2026-11-03T17:00:00Z');
+test('valid evidence passes',()=>assert.equal(verifyRelease(manifest(),now).decision,'SHIP'));
+test('0/0 fails',()=>{const m=manifest();m.requiredSuites[0].passed=0;assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('mismatched production fails',()=>{const m=manifest();m.productionCommit='b'.repeat(40);assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('stale evidence fails',()=>{const m=manifest();m.requiredSuites[0].completedAt='2026-10-01T00:00:00Z';assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('wrong test commit fails',()=>{const m=manifest();m.requiredSuites[0].commit='b'.repeat(40);assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('missing suites fails',()=>{const m=manifest();m.requiredSuites=[];assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('unresolved blocker fails',()=>{const m=manifest();m.unresolvedBlockers=['HARD281'];assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('failures fail',()=>{const m=manifest();m.requiredSuites[0].failed=1;assert.equal(verifyRelease(m,now).decision,'HOLD')});
