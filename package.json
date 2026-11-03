@@ -1,0 +1,1 @@
+{"name":"nara-forge-devtools","version":"0.1.0","description":"Independent release evidence verifier","type":"module","bin":{"nara-release-check":"./src/cli.js"},"scripts":{"test":"node --test","check:example":"node src/cli.js examples/release.json"},"engines":{"node":">=20"},"license":"MIT"}
