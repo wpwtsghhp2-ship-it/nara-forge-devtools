@@ -12,3 +12,8 @@ test('wrong test commit fails',()=>{const m=manifest();m.requiredSuites[0].commi
 test('missing suites fails',()=>{const m=manifest();m.requiredSuites=[];assert.equal(verifyRelease(m,now).decision,'HOLD')});
 test('unresolved blocker fails',()=>{const m=manifest();m.unresolvedBlockers=['HARD281'];assert.equal(verifyRelease(m,now).decision,'HOLD')});
 test('failures fail',()=>{const m=manifest();m.requiredSuites[0].failed=1;assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('duplicate required suites fail',()=>{const m=manifest();m.requiredSuites.push({...m.requiredSuites[0]});assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('malformed required suites fail closed',()=>{const m=manifest();m.requiredSuites='invalid';assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('array manifest fails closed',()=>assert.equal(verifyRelease([],now).decision,'HOLD'));
+test('future evidence fails',()=>{const m=manifest();m.requiredSuites[0].completedAt='2026-11-04T00:00:00Z';assert.equal(verifyRelease(m,now).decision,'HOLD')});
+test('skipped-only suite fails',()=>{const m=manifest();m.requiredSuites[0].passed=0;m.requiredSuites[0].skipped=10;assert.equal(verifyRelease(m,now).decision,'HOLD')});
